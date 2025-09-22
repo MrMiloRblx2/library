@@ -634,7 +634,7 @@ function AstroLib:MakeWindow(Configs)
 	UserInputService.MouseBehavior = Enum.MouseBehavior.Default
   end
 
-  local UISizeX, UISizeY = unpack(redzlib.Save.UISize)
+  local UISizeX, UISizeY = unpack(AstroLib.Save.UISize)
   local MainFrame = InsertTheme(Create("ImageButton", ScreenGui, {
     Size = UDim2.fromOffset(UISizeX, UISizeY),
     Position = UDim2.new(0.5, -UISizeX/2, 0.5, -UISizeY/2),
