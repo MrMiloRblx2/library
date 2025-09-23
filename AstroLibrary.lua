@@ -553,7 +553,7 @@ function AstroLib:GetIcon(IconName)
   if IconName:find("rbxassetid://") or IconName:len() < 1 then return IconName end
   IconName = IconName:lower():gsub("lucide", ""):gsub("-", "")
   
-  for Name, Icon in pairs(redzlib.Icons) do
+  for Name, Icon in pairs(AstroLib.Icons) do
     Name = Name:gsub("lucide", ""):gsub("-", "")
     if Name == IconName then
       return Icon
