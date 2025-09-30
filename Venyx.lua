@@ -201,12 +201,12 @@ end
 -- classes
 
 local library = {} -- main
-local page = {}
+local tab = {}
 local section = {}
 
 do
 	library.__index = library
-	page.__index = page
+	page.__index = tab
 	section.__index = section
 	
 	-- new classes
@@ -238,7 +238,7 @@ do
 					SliceCenter = Rect.new(24, 24, 276, 276)
 				}),
 				utility:Create("ImageLabel", {
-					Name = "Pages",
+					Name = "Tabs",
 					BackgroundTransparency = 1,
 					ClipsDescendants = true,
 					Position = UDim2.new(0, 0, 0, 38),
@@ -250,7 +250,7 @@ do
 					SliceCenter = Rect.new(4, 4, 296, 296)
 				}, {
 					utility:Create("ScrollingFrame", {
-						Name = "Pages_Container",
+						Name = "Tabs_Container",
 						Active = true,
 						BackgroundTransparency = 1,
 						Position = UDim2.new(0, 0, 0, 10),
@@ -297,15 +297,15 @@ do
 		
 		return setmetatable({
 			container = container,
-			pagesContainer = container.Main.Pages.Pages_Container,
-			pages = {}
+			pagesContainer = container.Main.Tabs.Tabs_Container,
+			tabs = {}
 		}, library)
 	end
 	
-	function page.new(library, title, icon)
+	function tab.new(library, title, icon)
 		local button = utility:Create("TextButton", {
 			Name = title,
-			Parent = library.pagesContainer,
+			Parent = library.tabsContainer,
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
 			Size = UDim2.new(1, 0, 0, 26),
@@ -411,7 +411,7 @@ do
 		})
 		
 		return setmetatable({
-			page = page,
+			tab = tab,
 			container = container.Container,
 			colorpickers = {},
 			modules = {},
@@ -420,21 +420,21 @@ do
 		}, section) 
 	end
 	
-	function library:addPage(...)
+	function library:addTab(...)
 	
-		local page = page.new(self, ...)
-		local button = page.button
+		local tab = tab.new(self, ...)
+		local button = tab.button
 		
-		table.insert(self.pages, page)
+		table.insert(self.tabs, tab)
 
 		button.MouseButton1Click:Connect(function()
-			self:SelectPage(page, true)
+			self:SelectTab(tab, true)
 		end)
 		
-		return page
+		return tab
 	end
 	
-	function page:addSection(...)
+	function tab:addSection(...)
 		local section = section.new(self, ...)
 		
 		table.insert(self.sections, section)
@@ -1477,11 +1477,11 @@ do
 			
 			if visible then
 			
-				if self.page.library.activePicker and self.page.library.activePicker ~= animate then
-					self.page.library.activePicker(nil, true)
+				if self.tab.library.activePicker and self.tab.library.activePicker ~= animate then
+					self.tab.library.activePicker(nil, true)
 				end
 				
-				self.page.library.activePicker = animate
+				self.tab.library.activePicker = animate
 				lastColor = Color3.fromHSV(hue, sat, brightness)
 				
 				local x1, x2 = button.AbsoluteSize.X / 2, 162--tab.AbsoluteSize.X
@@ -1809,16 +1809,16 @@ do
 	
 	-- class functions
 	
-	function library:SelectPage(page, toggle)
+	function library:SelectTab(tab, toggle)
 		
-		if toggle and self.focusedPage == page then -- already selected
+		if toggle and self.focusedPage == tab then -- already selected
 			return
 		end
 		
-		local button = page.button
+		local button = tab.button
 		
 		if toggle then
-			-- page button
+			-- tab button
 			button.Title.TextTransparency = 0
 			button.Title.Font = Enum.Font.GothamSemibold
 			
@@ -1827,41 +1827,41 @@ do
 			end
 			
 			-- update selected page
-			local focusedPage = self.focusedPage
-			self.focusedPage = page
+			local focusedTab = self.focusedTab
+			self.focusedTab = tab
 			
 			if focusedPage then
-				self:SelectPage(focusedPage)
+				self:SelectTab(focusedTab)
 			end
 			
 			-- sections
-			local existingSections = focusedPage and #focusedPage.sections or 0
-			local sectionsRequired = #page.sections - existingSections
+			local existingSections = focusedTab and #focusedTab.sections or 0
+			local sectionsRequired = #tab.sections - existingSections
 			
-			page:Resize()
+			tab:Resize()
 			
-			for i, section in pairs(page.sections) do
+			for i, section in pairs(tab.sections) do
 				section.container.Parent.ImageTransparency = 0
 			end
 			
 			if sectionsRequired < 0 then -- "hides" some sections
-				for i = existingSections, #page.sections + 1, -1 do
-					local section = focusedPage.sections[i].container.Parent
+				for i = existingSections, #tab.sections + 1, -1 do
+					local section = focusedTab.sections[i].container.Parent
 					
 					utility:Tween(section, {ImageTransparency = 1}, 0.1)
 				end
 			end
 			
 			wait(0.1)
-			page.container.Visible = true
+			tab.container.Visible = true
 			
-			if focusedPage then
-				focusedPage.container.Visible = false
+			if focusedTab then
+				focusedTab.container.Visible = false
 			end
 			
 			if sectionsRequired > 0 then -- "creates" more section
-				for i = existingSections + 1, #page.sections do
-					local section = page.sections[i].container.Parent
+				for i = existingSections + 1, #tab.sections do
+					local section = tab.sections[i].container.Parent
 					
 					section.ImageTransparency = 1
 					utility:Tween(section, {ImageTransparency = 0}, 0.05)
@@ -1879,9 +1879,9 @@ do
 			end
 			
 			wait(0.05)
-			page:Resize(true)
+			tab:Resize(true)
 		else
-			-- page button
+			-- tab button
 			button.Title.Font = Enum.Font.Gotham
 			button.Title.TextTransparency = 0.65
 			
@@ -1890,19 +1890,19 @@ do
 			end
 			
 			-- sections
-			for i, section in pairs(page.sections) do	
+			for i, section in pairs(tab.sections) do	
 				utility:Tween(section.container.Parent, {Size = UDim2.new(1, -10, 0, 28)}, 0.1)
 				utility:Tween(section.container.Title, {TextTransparency = 1}, 0.1)
 			end
 			
 			wait(0.1)
 			
-			page.lastPosition = page.container.CanvasPosition.Y
-			page:Resize()
+			tab.lastPosition = page.container.CanvasPosition.Y
+			tab:Resize()
 		end
 	end
 	
-	function page:Resize(scroll)
+	function tab:Resize(scroll)
 		local padding = 10
 		local size = 0
 		
@@ -1920,7 +1920,7 @@ do
 	
 	function section:Resize(smooth)
 	
-		if self.page.library.focusedPage ~= self.page then
+		if self.tab.library.focusedTab ~= self.tab then
 			return
 		end
 		
@@ -1935,7 +1935,7 @@ do
 			utility:Tween(self.container.Parent, {Size = UDim2.new(1, -10, 0, size)}, 0.05)
 		else
 			self.container.Parent.Size = UDim2.new(1, -10, 0, size)
-			self.page:Resize()
+			self.tab:Resize()
 		end
 	end
 	
